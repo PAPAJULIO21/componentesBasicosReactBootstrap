@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 function App() {
     const [films, setFilms] = useState([]);
     const [mainFilm, setMainFilm] = useState(null);
-
+    const [view, setView] = useState("main"); // Estado para controlar qué sección se muestra
 
     useEffect(() => {
         fetch("./peliculas.json")
@@ -19,13 +19,21 @@ function App() {
 
     const handleSelectFilm = (film) => {
         setMainFilm(film);
+        setView("main");
     };
 
-    
+    const verCategoria = () => {
+        setView("categoria");
+    };
+
+    const verDirectores = () => {
+        setView("directores");
+    };
+
     return (
         <Container>
-            {/* Película principal */}
-            {mainFilm && (
+            {/* Vista principal */}
+            {view === "main" && mainFilm && (
                 <Row className="mb-4">
                     {/* Imagen de la película principal */}
                     <Col xs={12} md={8}>
@@ -41,10 +49,31 @@ function App() {
                         <p><strong>Director:</strong> {mainFilm.director}</p>
                         <p><strong>Actores Principales:</strong> {mainFilm.actoresPrincipales.join(", ")}</p>
                         <p><strong>Sinopsis:</strong> {mainFilm.sinopsis}</p>
+                        <Button onClick={verCategoria}>Ver Categoría</Button>
+                        <Button onClick={verDirectores} className="ml-2">Ver Directores</Button>
                     </Col>
                 </Row>
             )}
 
+            {/* Vista de categoría */}
+            {view === "categoria" && (
+                <div>
+                    <h1>Categoría</h1>
+                    <p>Categoría de la película: {mainFilm?.categoria || "N/A"}</p>
+                    <Button onClick={() => setView("main")}>Volver</Button>
+                </div>
+            )}
+
+            {/* Vista de directores */}
+            {view === "directores" && (
+                <div>
+                    <h1>Directores</h1>
+                    <p>Director de la película: {mainFilm?.director || "N/A"}</p>
+                    <Button onClick={() => setView("main")}>Volver</Button>
+                </div>
+            )}
+
+            {/* Lista de películas */}
             <Row>
                 {films.map((film, index) => (
                     <Col xs={12} md={4} key={index} className="mb-4">
@@ -57,7 +86,7 @@ function App() {
                                 <Button variant="secondary" onClick={() => alert(film.sinopsis)}>Más</Button>
                                 <Button
                                     variant="primary"
-                                    onClick={() => handleSelectFilm(film)}  // Al seleccionar, se convierte en la película principal
+                                    onClick={() => handleSelectFilm(film)}
                                     className="ml-2"
                                 >
                                     Seleccionar
